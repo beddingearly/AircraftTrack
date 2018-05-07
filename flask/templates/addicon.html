@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<title>矢量图标</title>
+<style type="text/css">
+body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+    #allmap{width:100%;height:500px;}
+</style>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=nSxiPohfziUaCuONe4ViUP2N"></script>
+</head>
+
+<body>
+
+  <div id="allmap"></div>
+<div id="control">
+    <input type="button" onclick="hide()" value="隐藏">
+    <input type="button" onclick="show()" value="显示">
+</div>
+
+</body>
+
+<script type="text/javascript">
+var map = new BMap.Map("allmap");
+var point = new BMap.Point(116.473008,39.916605);
+map.centerAndZoom(point, 16);
+map.enableScrollWheelZoom(true);
+
+
+//设置marker图标为飞机
+var vectorPlane = new BMap.Marker(new BMap.Point(point.lng+0.04,point.lat-0.03), {
+  // 初始化小飞机Symbol
+    icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
+    scale: 3,
+    rotation: 0
+  })
+});
+
+map.addOverlay(vectorPlane);
+
+map.setViewport({center:new BMap.Point(116.501035,39.897538),zoom:14})
+
+function hide(){
+  vectorPlane.hide();
+
+}
+function show(){
+  vectorPlane.show();
+
+}
+</script>
+
+</html>

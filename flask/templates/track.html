@@ -1,0 +1,106 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<title>aircraft track</title>
+<style type="text/css">
+body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+    #container{width:100%;height:500px;}
+</style>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=nSxiPohfziUaCuONe4ViUP2N"></script>
+
+</head>  
+<body>  
+<div style="width:820px;height:500px;border:1px solid gray" id="container"></div>  
+<script type="text/javascript">  
+    var map = new BMap.Map("container");  
+    map.centerAndZoom(new BMap.Point(114.31, 30.52), 16);  
+    map.enableScrollWheelZoom(true)
+    map.addControl(new BMap.NavigationControl());               // 添加平移缩放控件  
+    map.addControl(new BMap.ScaleControl());                    // 添加比例尺控件  
+    map.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件  
+
+
+    ///////////////////////////////////////////////////////////////////
+
+    function tran_bmap(arr){
+        var ggPoint = new BMap.Point(arr[0], arr[1]);
+        
+        return ggPoint;
+    }
+
+    function add_polyline(arr1, arr2){
+        var polyline = new BMap.Polyline([arr1, arr2], 
+            {strokeColor:"red",
+            strokeWeight:2,
+            strokeOpecity:0.5});
+        map.addOverlay(polyline)
+
+        //调整到最佳视野
+        map.setViewport([arr1, arr2]);
+    }
+
+    //remove all
+    function remove_all(){
+        map.clearOverlays();
+    }
+
+    function add_plane_icon(point, heading){
+        var plane = new BMap.Marker(new BMap.Point(point.lng,point.lat), {
+            // 初始化小飞机Symbol
+            icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
+            scale: 1.5,
+            rotation: 275,
+            fillColor: "orange",//填充颜色
+            fillOpacity: 0.8//填充透明度
+            })
+        });
+
+        map.addOverlay(plane);
+        show_message(plane, point)
+        
+    }
+
+    function hide(plane){
+        plane.hide();
+    }
+    function show(plane){
+        plane.show();
+    }
+
+    function show_message(plane, point){
+        var sContent = 
+        "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>CCA1560</h4>" + 
+    "<img style='float:right;margin:4px' id='imgDemo' src='../pics/c919.jpg' width='139' height='104' title='China'/>" + 
+    "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>China No.1</p>" + 
+    "</div>";
+
+        var infoWindow = new BMap.InfoWindow(sContent);// 创建信息窗口对象
+        var myIcon = new BMap.Icon("../pics/airports.png", new BMap.Size(23, 25));
+        var marker = new BMap.Marker(new BMap.Point(point.lng,point.lat), {icon: myIcon});
+        map.addOverlay(marker);
+        map.addOverlay(plane)
+
+        marker.addEventListener("click", function(){          
+            this.openInfoWindow(infoWindow);
+ 
+        });
+    }
+
+
+
+    var b = [114.31,30.52];
+    var x = [111.3,30.7];
+
+    var beijing = tran_bmap(b);
+    var xian = tran_bmap(x);
+
+    add_plane_icon(beijing, 1);
+
+    add_polyline(beijing, xian);
+  
+    
+</script>  
+</body>  
+</html>  
