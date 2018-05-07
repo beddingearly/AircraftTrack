@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+	<Style id="airplane">
+		<IconStyle>
+			<Icon><href>airports.png</href></Icon>
+		</IconStyle>
+	</Style>
+	<Style id="rangering">
+	<LineStyle>
+		<color>9f4f4faf</color>
+		<width>2</width>
+	</LineStyle>
+	</Style>
+	<Style id="track">
+	<LineStyle>
+		<color>5fff8f8f</color>
+		<width>4</width>
+	</LineStyle>
+	</Style>	<Folder>
+		<name>Aircraft locations</name>
+		<open>0</open>
+	</Folder>
+</Document>
+</kml>

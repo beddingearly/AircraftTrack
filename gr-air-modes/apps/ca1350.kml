@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+	<Style id="airplane">
+		<IconStyle>
+			<Icon><href>airports.png</href></Icon>
+		</IconStyle>
+	</Style>
+	<Style id="rangering">
+	<LineStyle>
+		<color>9f4f4faf</color>
+		<width>2</width>
+	</LineStyle>
+	</Style>
+	<Style id="track">
+	<LineStyle>
+		<color>ff1eff00</color>
+		<width>4</width>
+	</LineStyle>
+	</Style>	
+	<Folder>
+		<name>Aircraft locations</name>
+		<open>0</open>
+
+		<!---->
+		<Placemark>
+			<name>CCA1350 </name>
+			<Style><IconStyle><heading>358</heading></IconStyle></Style>
+			<styleUrl>#airplane</styleUrl>
+			<description>
+				<![CDATA[Altitude: 23575<br/>Heading: 283<br/>Speed: 371<br/>Vertical speed: -64<br/>ICAO: 7809bc<br/>Last seen: 2018-04-15 03:53:22]]>
+			</description>
+			<Point>
+				<altitudeMode>absolute</altitudeMode>
+				<extrude>1</extrude>
+				<coordinates>
+				114.29783,30.954234,6888.48
+				</coordinates>
+			</Point>
+		</Placemark>
+		<!---->
+		<Placemark>
+			<styleUrl>#track</styleUrl>
+			<LineString>
+				<extrude>0</extrude>
+				<altitudeMode>absolute</altitudeMode>
+				<coordinates>
+						114.29783,30.954234,6888.48
+						114.28883,30.935267,6888.48
+						114.246399,30.854187,6888.48
+						114.203399,30.773297,6888.48
+						114.1819,30.730854,6888.48
+						114.118011,30.608747,6888.48
+						114.108011,30.588747,6888.48
+						114.098011,30.568747,6888.48
+				</coordinates>
+			</LineString>
+		</Placemark>
+		<!---->
+
+	</Folder>
+</Document>
+</kml>

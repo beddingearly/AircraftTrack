@@ -1,0 +1,99 @@
+#!/usr/bin/python2.7
+# Copyright 2010, 2013 Nick Foster
+# 
+# This file is part of gr-air-modes
+# 
+# gr-air-modes is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+# 
+# gr-air-modes is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with gr-air-modes; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street,
+# Boston, MA 02110-1301, USA.
+# 
+
+from gnuradio.eng_option import eng_option
+from gnuradio.gr.pubsub import pubsub
+from optparse import OptionParser
+import time, os, sys, threading, math
+from string import split, join
+import air_modes
+from air_modes.types import *
+from air_modes.exceptions import *
+import zmq
+
+#todo: maybe move plugins to separate programs (flightgear, SBS1, etc.)
+def main():
+  my_position = None
+  usage = "%prog: [options]"
+  optparser = OptionParser(option_class=eng_option, usage=usage)
+  air_modes.modes_radio.add_radio_options(optparser)
+
+  optparser.add_option("-l","--location", type="string", default=None,
+                       help="GPS coordinates of receiving station in format xx.xxxxx,xx.xxxxx")
+  #data source options
+  optparser.add_option("-a","--remote", type="string", default=None,
+                       help="specify additional servers from which to take data in format tcp://x.x.x.x:y,tcp://....")
+  optparser.add_option("-n","--no-print", action="store_true", default=False,
+                       help="disable printing decoded packets to stdout")
+  #output plugins
+  optparser.add_option("-K","--kml", type="string", default=None,
+                       help="filename for Google Earth KML output")
+  optparser.add_option("-P","--sbs1", action="store_true", default=False,
+                       help="open an SBS-1-compatible server on port 30003")
+  optparser.add_option("-m","--multiplayer", type="string", default=None,
+                       help="FlightGear server to send aircraft data, in format host:port")
+
+  (options, args) = optparser.parse_args()
+
+  #construct the radio
+  context = zmq.Context(1)
+  tb = air_modes.modes_radio(options, context)
+  servers = ["inproc://modes-radio-pub"]
+  if options.remote is not None:
+    servers += options.remote.split(",")
+  relay = air_modes.zmq_pubsub_iface(context, subaddr=servers, pubaddr=None)
+  publisher = pubsub()
+  relay.subscribe("dl_data", air_modes.make_parser(publisher))
+
+  if options.location is not None:
+    my_position = [float(n) for n in options.location.split(",")]
+
+  #CPR decoder obj to handle getting position from BDS0,5 and BDS0,6 pkts
+  cpr_dec = air_modes.cpr_decoder(my_position)
+
+  if options.kml is not None:
+    dbname = 'adsb.db'
+    lock = threading.Lock()
+    sqldb = air_modes.output_sql(cpr_dec, dbname, lock, publisher) #input into the db
+    kmlgen = air_modes.output_kml(options.kml, dbname, my_position, lock) #create a KML generating thread to read from the db
+
+  if options.no_print is not True:
+    printer = air_modes.output_print(cpr_dec, publisher)
+
+  if options.multiplayer is not None:
+    [fghost, fgport] = options.multiplayer.split(':')
+    fgout = air_modes.output_flightgear(cpr_dec, fghost, int(fgport), publisher)
+
+  if options.sbs1 is True:
+    sbs1port = air_modes.output_sbs1(cpr_dec, 30003, publisher)
+
+  tb.run()
+  time.sleep(0.2)
+  tb.close()
+  time.sleep(0.2)
+  relay.close()
+
+  if options.kml is not None:
+    kmlgen.close()
+    
+
+if __name__ == '__main__':
+  main()
