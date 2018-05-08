@@ -8,8 +8,8 @@
 	</Style>
 	<Style id="rangering">
 	<LineStyle>
-		<color>9f4f4faf</color>
-		<width>2</width>
+		<color>9f2f4faf</color>
+		<width>0</width>
 	</LineStyle>
 	</Style>
 	<Style id="track">
@@ -28,7 +28,7 @@
 			<Style><IconStyle><heading>358</heading></IconStyle></Style>
 			<styleUrl>#airplane</styleUrl>
 			<description>
-				<![CDATA[Altitude: 23575<br/>Heading: 283<br/>Speed: 371<br/>Vertical speed: -64<br/>ICAO: 7809bc<br/>Last seen: 2018-04-15 03:53:22]]>
+				<![CDATA[Altitude: 23575<br/>Heading: 283<br/>Speed: 371<br/>Vertical speed: -64<br/>ICAO: 7809bc<br/>Last seen: 2018-04-15 03:53:22 <img src="../../img/CCA.jpg" width="300px" height="200px"/>]]>
 			</description>
 			<Point>
 				<altitudeMode>absolute</altitudeMode>
