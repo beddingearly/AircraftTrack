@@ -1,5 +1,6 @@
 #coding=utf-8
 
+import time
 import sqlite3
 import argparse
 import csv
@@ -81,7 +82,8 @@ class SqliteOperator(object):
 
         csvFile.close()
 
-    def write_to_kml(self):
+    def write_to_kml(self, utc, ident, icao, alt, lat, lon, speed, heading, vertical, image, history):
+
         retstr = """<?xml version="1.0" encoding="UTF-8"?>\n"""
 
         doc = KML.kml(
@@ -109,22 +111,22 @@ class SqliteOperator(object):
                     KML.name("Aircraft locations"),
                     KML.open(0),
                     KML.Placemark(
-                        KML.name("CCA1360"),
+                        KML.name(ident),
                         KML.Style(
                             KML.IconStyle(
-                                KML.heading(90)
+                                KML.heading(heading)
                             )
                         ),
                         KML.styleUrl("#airplane"),
                         KML.description(
-                            "Altitude: {}<br/>Heading: {} <br/>Speed: {}<br/>Vertical speed:{}<br/>ICAO: {}<br/>Last seen: {} <img src='../../CCA.jpg' width='300px' height='200px'/>".format(1,2,3,4,5,6)
+                            "Altitude: {}<br/>Heading: {} <br/>Speed: {}<br/>Vertical speed:{}<br/>ICAO: {}<br/>Last seen: {} <img src='../../img/{}' width='300px' height='200px'/>".format(alt, heading, speed, vertical, icao, utc, image)
 
                         ),
 
                         KML.Point(
                             KML.altitudeMode("absolute"),
                             KML.extrude(1),
-                            KML.coordinates(114.566668, 30.455795, 8869)
+                            KML.coordinates("{},{},{}".format(lon, lat, alt))
                         )
                     ),
                     KML.Placemark(
@@ -132,13 +134,11 @@ class SqliteOperator(object):
                         KML.LineString(
                             KML.extrude(0),
                             KML.altitudeMode("absolute"),
-                            KML.coordinates(114.566668, 30.455795, 8869.680000)
+                            KML.coordinates("{} ".format(history))
                         )
                     )
-
                 )
             )
-
         )
 
         outfile = open('out.kml', 'wb')
@@ -148,7 +148,24 @@ class SqliteOperator(object):
 
 
     def update_kml(self):
-        pass
+        time.sleep(5)
+        flag = 0
+        history = ''
+        for msg in self.message:
+            utc = msg[0]
+            ident = msg[1]
+            image = msg[1][:3]+'.jpg'
+            icao = msg[2]
+            alt = msg[3]
+            lat = msg[4]
+            lon = msg[5]
+            speed = msg[6]
+            heading = msg[7]
+            vertical = msg[8]
+            history += str(lon) + ',' + str(lat) + ',' + str(alt) + " "
+            self.write_to_kml(utc, ident, icao, alt, lat, lon, speed, heading, vertical, image, history)
+            flag = 1
+            time.sleep(0.5)
 
 
 def parse_arge():
@@ -163,8 +180,8 @@ def parse_arge():
 if __name__ == '__main__':
     database = "2018-4-15.db"
     table = "ident"
-    ident = "CES2738" # missing two space
+    ident = "CCA4502" # missing two space
     csvfile = 'output.csv'
     kmlfile = 'output.kml'
     a = SqliteOperator(database, table, ident, csvfile, kmlfile)
-    a.write_to_kml()
+    a.update_kml()
