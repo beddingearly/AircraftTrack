@@ -74,7 +74,7 @@ class SqliteOperator(object):
     def write_to_csv(self):
         csvFile = open(self.csvfile, 'wb')
         writer = csv.writer(csvFile)
-        head = ['UTC','航班号','识别码', '海拔', '经度', '纬度', '速度', '方向','垂直速度']
+        head = ['UTC', '航班号', '识别码', '海拔', '经度', '纬度', '速度', '方向','垂直速度']
         writer.writerow(head)
 
         for msg in self.message:
@@ -176,12 +176,18 @@ def parse_arge():
     parser.add_argument('--plane', type=str, help='choose a plane')
     parser.add_argument('--csvfile', type=str, help='create a csv file')
     parser.add_argument('--kmlfile', type=str, help='create a kml file')
+    return parser.parse_args()
+
+
 
 if __name__ == '__main__':
-    database = "2018-4-15.db"
-    table = "ident"
-    ident = "CCA4502" # missing two space
-    csvfile = 'output.csv'
-    kmlfile = 'output.kml'
+    args = parse_arge()
+
+    database = args.database
+    table = args.table
+    ident = args.plane # missing two space
+    csvfile = args.csvfile
+    kmlfile = args.kmlfile
     a = SqliteOperator(database, table, ident, csvfile, kmlfile)
+    a.write_to_csv()
     a.update_kml()
