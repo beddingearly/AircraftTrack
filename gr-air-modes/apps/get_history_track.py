@@ -85,58 +85,60 @@ class SqliteOperator(object):
         retstr = """<?xml version="1.0" encoding="UTF-8"?>\n"""
 
         doc = KML.kml(
-            KML.Style({"id": "airplane"},
-                KML.IconStyle(
-                    KML.Icon(
-                        KML.href("airports.png")
-                    )
-                )
-            ),
-            KML.Style({"id": "ranging"},
-                KML.LineStyle(
-                    KML.color("9f4f4faf"),
-                    KML.width(2)
-                )
-            ),
-            KML.Style({"id": "trace"},
-                KML.IconStyle(
-                    KML.color("5fff8f8f"),
-                    KML.width(4)
-                )
-            ),
-            KML.Folder(
-                KML.name("Aircraft locations"),
-                KML.open(0),
-                KML.Placemark(
-                    KML.name("CCA1360"),
-                    KML.Style(
-                        KML.IconStyle(
-                            KML.heading(283)
+            KML.Document(
+                KML.Style({"id": "airplane"},
+                          KML.IconStyle(
+                              KML.Icon(
+                                  KML.href("airports.png")
+                              )
+                          )
+                          ),
+                KML.Style({"id": "rangering"},
+                          KML.LineStyle(
+                              KML.color("9f4f4faf"),
+                              KML.width(2)
+                          )
+                          ),
+                KML.Style({"id": "track"},
+                          KML.LineStyle(
+                              KML.color("5fff8f8f"),
+                              KML.width(4)
+                          )
+                          ),
+                KML.Folder(
+                    KML.name("Aircraft locations"),
+                    KML.open(0),
+                    KML.Placemark(
+                        KML.name("CCA1360"),
+                        KML.Style(
+                            KML.IconStyle(
+                                KML.heading(90)
+                            )
+                        ),
+                        KML.styleUrl("#airplane"),
+                        KML.description(
+                            "Altitude: {}<br/>Heading: {} <br/>Speed: {}<br/>Vertical speed:{}<br/>ICAO: {}<br/>Last seen: {} <img src='../../CCA.jpg' width='300px' height='200px'/>".format(1,2,3,4,5,6)
+
+                        ),
+
+                        KML.Point(
+                            KML.altitudeMode("absolute"),
+                            KML.extrude(1),
+                            KML.coordinates(114.566668, 30.455795, 8869)
                         )
                     ),
-                    KML.StyleUrl("#airplane"),
-                    KML.description("<![CDATA[Altitude: 29100<br/>"
-                                    "Heading: 97<br/>"
-                                    "Speed: 474<br/>"
-                                    "Vertical speed: 0<br/>"
-                                    "ICAO: 780721<br/>"
-                                    "Last seen: 2018-04-14 15:44:44]]>"),
-                    KML.Point(
-                        KML.altitudeMode("absolute"),
-                        KML.extrude(1),
-                        KML.coordinates(114.566668,30.455795,8869)
+                    KML.Placemark(
+                        KML.styleUrl("#track"),
+                        KML.LineString(
+                            KML.extrude(0),
+                            KML.altitudeMode("absolute"),
+                            KML.coordinates(114.566668, 30.455795, 8869.680000)
+                        )
                     )
-                ),
-                KML.Placemark(
-                    KML.StyleUrl("#track"),
-                    KML.LineString(
-                        KML.extrude(0),
-                        KML.altitudeMode("absolute"),
-                        KML.coordinates(114.566668, 30.455795, 8869.680000)
-                    )
-                )
 
+                )
             )
+
         )
 
         outfile = open('out.kml', 'wb')
