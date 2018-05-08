@@ -4,6 +4,11 @@ import sqlite3
 import argparse
 import csv
 import logging
+from lxml import etree
+from pykml.parser import Schema
+from pykml.factory import KML_ElementMaker as KML
+from pykml.factory import GX_ElementMaker as GX
+
 
 class SqliteOperator(object):
 
@@ -77,8 +82,67 @@ class SqliteOperator(object):
         csvFile.close()
 
     def write_to_kml(self):
-        retstr = """<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n\t<Style id="airplane">\n\t\t<IconStyle>\n\t\t\t<Icon><href>airports.png</href></Icon>\n\t\t</IconStyle>\n\t</Style>\n\t<Style id="rangering">\n\t<LineStyle>\n\t\t<color>9f4f4faf</color>\n\t\t<width>2</width>\n\t</LineStyle>\n\t</Style>\n\t<Style id="track">\n\t<LineStyle>\n\t\t<color>5fff8f8f</color>\n\t\t<width>4</width>\n\t</LineStyle>\n\t</Style>"""
-        pass
+        retstr = """<?xml version="1.0" encoding="UTF-8"?>\n"""
+
+        doc = KML.kml(
+            KML.Style({"id": "airplane"},
+                KML.IconStyle(
+                    KML.Icon(
+                        KML.href("airports.png")
+                    )
+                )
+            ),
+            KML.Style({"id": "ranging"},
+                KML.LineStyle(
+                    KML.color("9f4f4faf"),
+                    KML.width(2)
+                )
+            ),
+            KML.Style({"id": "trace"},
+                KML.IconStyle(
+                    KML.color("5fff8f8f"),
+                    KML.width(4)
+                )
+            ),
+            KML.Folder(
+                KML.name("Aircraft locations"),
+                KML.open(0),
+                KML.Placemark(
+                    KML.name("CCA1360"),
+                    KML.Style(
+                        KML.IconStyle(
+                            KML.heading(283)
+                        )
+                    ),
+                    KML.StyleUrl("#airplane"),
+                    KML.description("<![CDATA[Altitude: 29100<br/>"
+                                    "Heading: 97<br/>"
+                                    "Speed: 474<br/>"
+                                    "Vertical speed: 0<br/>"
+                                    "ICAO: 780721<br/>"
+                                    "Last seen: 2018-04-14 15:44:44]]>"),
+                    KML.Point(
+                        KML.altitudeMode("absolute"),
+                        KML.extrude(1),
+                        KML.coordinates(114.566668,30.455795,8869)
+                    )
+                ),
+                KML.Placemark(
+                    KML.StyleUrl("#track"),
+                    KML.LineString(
+                        KML.extrude(0),
+                        KML.altitudeMode("absolute"),
+                        KML.coordinates(114.566668, 30.455795, 8869.680000)
+                    )
+                )
+
+            )
+        )
+
+        outfile = open('out.kml', 'wb')
+        outfile.write(retstr)
+        outfile.write(etree.tostring(doc, pretty_print=True))
+
 
 
     def update_kml(self):
@@ -101,4 +165,4 @@ if __name__ == '__main__':
     csvfile = 'output.csv'
     kmlfile = 'output.kml'
     a = SqliteOperator(database, table, ident, csvfile, kmlfile)
-    #print(a.vectors)
+    a.write_to_kml()
