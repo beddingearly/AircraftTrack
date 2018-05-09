@@ -91,7 +91,7 @@ class SqliteOperator(object):
                 KML.Style({"id": "airplane"},
                           KML.IconStyle(
                               KML.Icon(
-                                  KML.href("airports.png")
+                                  KML.href("gr-air-modes/apps/airports.png")
                               )
                           )
                           ),
@@ -103,7 +103,7 @@ class SqliteOperator(object):
                           ),
                 KML.Style({"id": "track"},
                           KML.LineStyle(
-                              KML.color("5fff8f8f"),
+                              KML.color("ff1eff00"),
                               KML.width(4)
                           )
                           ),
@@ -119,7 +119,7 @@ class SqliteOperator(object):
                         ),
                         KML.styleUrl("#airplane"),
                         KML.description(
-                            "Altitude: {}<br/>Heading: {} <br/>Speed: {}<br/>Vertical speed:{}<br/>ICAO: {}<br/>Last seen: {} <img src='../../img/{}' width='300px' height='200px'/>".format(alt, heading, speed, vertical, icao, utc, image)
+                            "Altitude: {}<br/>Heading: {} <br/>Speed: {}<br/>Vertical speed:{}<br/>ICAO: {}<br/>Last seen: {} <img src='img/{}' width='300px' height='200px'/>".format(alt, heading, speed, vertical, icao, utc, image)
 
                         ),
 
@@ -134,7 +134,7 @@ class SqliteOperator(object):
                         KML.LineString(
                             KML.extrude(0),
                             KML.altitudeMode("absolute"),
-                            KML.coordinates("{} ".format(history))
+                            KML.coordinates("{}".format(history))
                         )
                     )
                 )
@@ -149,7 +149,6 @@ class SqliteOperator(object):
 
     def update_kml(self):
         time.sleep(5)
-        flag = 0
         history = ''
         for msg in self.message:
             utc = msg[0]
@@ -162,10 +161,9 @@ class SqliteOperator(object):
             speed = msg[6]
             heading = msg[7]
             vertical = msg[8]
-            history += str(lon) + ',' + str(lat) + ',' + str(alt) + " "
+            history = str(lon) + ',' + str(lat) + ',' + str(alt) + " " + history
             self.write_to_kml(utc, ident, icao, alt, lat, lon, speed, heading, vertical, image, history)
-            flag = 1
-            time.sleep(0.5)
+            time.sleep(0.2)
 
 
 def parse_arge():
