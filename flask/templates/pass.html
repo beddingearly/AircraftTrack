@@ -23,21 +23,18 @@
 <script type="text/javascript">
 	function ddd() {
 		$SCRIPT_ROOT = {{request.script_root|tojson|safe}}
-		$.getJSON($SCRIPT_ROOT+'/ddd', {
-			ddd: "ddd"
-		}, function (data) {
+			$.getJSON($SCRIPT_ROOT+'/ddd', {
+				ddd: "ddd"
+			}, function (data) {
 			//console.log(data)
-			console.log(data)
+				console.log(data);
 
 		}
 		);
 	}
-	//ddd();
+	ddd();
+	console.log('121212')
 
-	function a(){
-		console.log({{name[2]}})
-	}
-	a()
 
 
 
