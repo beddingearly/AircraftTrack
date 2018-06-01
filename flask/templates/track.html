@@ -9,10 +9,15 @@ body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
     #container{width:100%;height:500px;}
 </style>
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=nSxiPohfziUaCuONe4ViUP2N"></script>
-
+    <script src="../static/echarts.min.js"></script>
+    <script src="../static/jquery-3.3.1.js"></script>
 </head>  
-<body>  
-<div style="width:820px;height:500px;border:1px solid gray" id="container"></div>  
+<body>
+    <button type="button" onclick="search()">开始</button>
+    <input type="text" id="ident">
+    <button type="button" onclick="remove_all()">清除</button>
+<div style="width:100%;height:100%;border:1px solid gray" id="container"></div>
+
 <script type="text/javascript">  
     var map = new BMap.Map("container");  
     map.centerAndZoom(new BMap.Point(114.31, 30.52), 16);  
@@ -21,12 +26,63 @@ body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
     map.addControl(new BMap.ScaleControl());                    // 添加比例尺控件  
     map.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件  
 
-
     ///////////////////////////////////////////////////////
+
+        function search(){
+        $SCRIPT_ROOT = {{request.script_root|tojson|safe}}
+        var keyvalue=document.getElementById('ident').value;
+            $.getJSON($SCRIPT_ROOT+'/ddd', {
+                ddd: keyvalue
+            }, function (data) {
+                //jump()
+                console.log(data);
+                var bpoint = [];
+                var len = data.length;
+
+                for(var i = 0; i < len; i++){
+                    
+
+                    var utc = data[i][0]
+                    var ident = data[i][1]
+                    var icao = data[i][2]
+                    var alt = parseInt(data[i][3])
+                    var lat = parseInt(data[i][4])
+                    var lon = parseInt(data[i][5])
+                    var speed = data[i][6]
+                    var heading = parseInt(data[i][7])
+                    var vertical = data[i][8]
+
+                    if (i == 0){
+                        var point_tt = [lon, lat]
+                        var point_t = tran_bmap(point_tt)
+                    }
+
+                    var point_c = [lon, lat]
+                    var point = tran_bmap(point_c)
+                    bpoint.push(point)
+
+                    sleep(1000)
+                    add_polyline(point_t, point)
+                    add_plane_icon(point, heading)
+                    console.log(i)
+
+                    point_t = point//保存历史轨迹
+
+
+                }
+
+
+            }
+        );
+    }
+
+
+    function sleep(d){
+        for(var t = Date.now();Date.now() - t <= d;);
+    }
 
     function tran_bmap(arr){
         var ggPoint = new BMap.Point(arr[0], arr[1]);
-        
         return ggPoint;
     }
 
@@ -36,7 +92,6 @@ body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
             strokeWeight:2,
             strokeOpecity:0.5});
         map.addOverlay(polyline)
-
         //调整到最佳视野
         map.setViewport([arr1, arr2]);
     }
@@ -88,6 +143,14 @@ body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
         });
     }
 
+    function setZoom(bPoints){  
+        var view = map.getViewport(eval(bPoints));  
+        var mapZoom = view.zoom;   
+        var centerPoint = view.center;   
+        map.centerAndZoom(centerPoint,mapZoom);  
+    }  
+
+
 
 
     var b = [114.31,30.52];
@@ -96,9 +159,9 @@ body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
     var beijing = tran_bmap(b);
     var xian = tran_bmap(x);
 
-    add_plane_icon(beijing, 1);
+    //add_plane_icon(beijing, 1);
 
-    add_polyline(beijing, xian);
+    //add_polyline(beijing, xian);
   
     
 </script>  

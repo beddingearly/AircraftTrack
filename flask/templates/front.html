@@ -8,46 +8,22 @@
     <script src="../static/jquery-3.3.1.js"></script>
 </head>
 <body bgcolor=black>
-	<button type="button">实时飞行轨迹展示</button>
-	<button type="button" onclick="search()">历史飞行轨迹重演</button>
-	<input type="text" id="ident">
-	<img src="../static/pics/4.gif" align ="right" width="800" height="430"/>
+	<button type="button" onclick="jump2()">实时飞行轨迹展示</button>
+	<button type="button" onclick="jump()">历史飞行轨迹重演</button>
+	<!--input type="text" id="ident"-->
+	<img src="../static/pics/4.gif" align ="right" width="100%" height=100%/>
 
 
 
 	<script type="text/javascript">
-	function search(){
-		$SCRIPT_ROOT = {{request.script_root|tojson|safe}}
-		var keyvalue=document.getElementById('ident').value;
-			$.getJSON($SCRIPT_ROOT+'/ddd', {
-				ddd: keyvalue
-			}, function (data) {
-				jump()
-				console.log(data[1][1]);
-
-				
-				var len = data.length;
-
-				for(var i = 0; i < len; i++){
-					var utc = data[i][0]
-					var ident = data[i][1]
-					var icao = data[i][2]
-					var alt = data[i][3]
-					var lat = data[i][4]
-					var lon = data[i][5]
-					var speed = data[i][6]
-					var heading = data[i][7]
-					var vertical = data[i][8]
-				}	
-
-		}
-		);
-	}
-
 
 
 	function jump(){
 		window.open("showmap")
+	}
+
+	function jump2(){
+		window.open("showmap2")
 	}
 
 	</script>
