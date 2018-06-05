@@ -47,16 +47,13 @@
 			
 		}
 
-		function showOneTime(){
-
-		}
-
+		
 
 		function search(){
         	$SCRIPT_ROOT = {{request.script_root|tojson|safe}}
        		var keyvalue=document.getElementById('ident').value;
-            	$.getJSON($SCRIPT_ROOT+'/ddd', {
-                	ddd: keyvalue
+            	$.getJSON($SCRIPT_ROOT+'/search', {
+                	search: keyvalue
             	}, function (data) {
 
 

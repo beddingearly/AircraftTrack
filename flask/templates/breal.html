@@ -14,12 +14,16 @@
 </head>  
 
 <body>
-	<button type="button" onclick="search()">开始</button>
+	<button type="button" onclick="begin()">开始</button>
+	<button type="button" onclick="remove_all()">清除</button>
 
 <div style="width:100%;height:100%;border:1px solid gray" id="container"></div>
 
 	<div id="container"></div> 
 	<script type="text/javascript">
+
+	var points = [];//原始点信息数组
+	var bPoints = [];//百度化坐标数组。用于更新显示范围。
 
 	var map = new BMap.Map("container");  
 
@@ -27,7 +31,140 @@
 
 	map.enableScrollWheelZoom();//滚轮放大缩小
 
+	function begin(){
+		$SCRIPT_ROOT = {{request.script_root|tojson|safe}}
+            $.getJSON($SCRIPT_ROOT+'/parse', {
+                filename: '../out.kml'
+            }, function (data) {
+            	//console.log(data);
 
+            	for(var i = 0; i < data.length; i++){
+            		if (data[i].length == 0) {
+            			continue;
+            		}
+
+            	var ident = data[i][0];
+            	var heading = parseInt(data[i][1]);
+            	var msg = data[i][2].split("<br/>");
+            	var alt = parseFloat(msg[0].split(": ")[1]);
+            	var speed = msg[2].split(": ")[1];
+            	var vertical = msg[3].split(": ")[1];
+            	var icao = msg[4].split(": ")[1]
+            	var utc = msg[4].split("n: ")[1]
+                var lat = parseFloat(data[i][3].split(",")[1])
+                var lon = parseFloat(data[i][3].split(",")[0])
+
+                var point = {"utc":utc,
+                			"ident":ident,
+                			"icao":icao,
+                			"alt":alt,
+                			"lon":lon,
+                			"lat":lat,
+                			"speed":speed,
+                			"heading":heading,
+                			"vertical":vertical,
+                			"ident":ident
+                		}
+                console.log(point);
+                show(point, points);
+                
+               	}
+            }
+
+    );
+            setTimeout(begin(), 20000);
+         	//begin()
+	}
+
+	function show(point, points){
+				add_plane_icon(point);//增加对应该的轨迹点
+				points.push(point);
+				bPoints.push(new BMap.Point(point.lon,point.lat));
+				addMarker(point)
+				//var len = points.length;
+				//newLinePoints = points.slice(len-2, len);//最后两个点用来画线。
+				//addLine(newLinePoints);//增加轨迹线
+				setZoom(bPoints);
+    	}
+
+	function remove_all(){
+        	map.clearOverlays();
+        	map.centerAndZoom(new BMap.Point(114.31, 30.52), 12);
+        	console.log("clear all")
+    	}
+
+
+    function addMarker(points){
+			var pointsLen = points.length;
+			if(pointsLen == 0){
+				return;
+			}
+			var myIcon = new BMap.Icon("../static/pics/no.png", new BMap.Size(5, 5), {
+				offset: new BMap.Size(5, 5) 
+			});
+
+			// 创建标注对象并添加到地图   
+			for(var i = 0;i <pointsLen;i++){
+				var point = new BMap.Point(points[i].lon,points[i].lat);
+				var marker = new BMap.Marker(point, {icon: myIcon});
+				map.addOverlay(marker); 
+			}
+		}
+
+
+	function add_plane_icon(point){
+        	var plane = new BMap.Marker(new BMap.Point(point.lon,point.lat), {
+            // 初始化小飞机Symbol
+            icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
+            scale: 1.5,
+            rotation: point.heading,
+            fillColor: "blue",//填充颜色
+            fillOpacity: 0.8//填充透明度
+            })
+        });
+
+        	map.addOverlay(plane);
+        	show_message(plane, point)
+        
+    }
+
+    function setZoom(bPoints){
+			var view = map.getViewport(eval(bPoints));
+			if(map.oldView != JSON.stringify(view)){
+				var mapZoom = view.zoom; 
+				var centerPoint = view.center; 
+				map.centerAndZoom(centerPoint,mapZoom);
+				map.oldView = JSON.stringify(view);
+			}
+
+		}
+
+
+    function show_message(plane, point){
+    		var path = '../static/img/'+point.ident.substring(0, 3)+'.jpg';
+        	var sContent = 
+        "<h4 style='margin:0 0 2px 0;padding:0.2em 0'>航班号:"+point.ident+"</h4>" + 
+    "<img style='float:middle;margin:4px' id='imgDemo' src="+path+" width='139' height='104' title='AirCraft'/>" +
+    "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"+"<br>"+
+    	"UTC:"+point.utc+"<br>"+
+    	"纬度: "+point.lat+"<br>"+
+    	"经度: "+point.lon+"<br>"+
+    	"海拔: "+point.alt+"<br>"+
+    	"速度: "+point.speed+"<br>"+
+    "</p>" + 
+    "</div>";
+
+        	var infoWindow = new BMap.InfoWindow(sContent);// 创建信息窗口对象
+        	var myIcon = new BMap.Icon("../static/pics/no.jpg", new BMap.Size(23, 25));
+        	var marker = new BMap.Marker(new BMap.Point(point.lon,point.lat), {icon: myIcon});
+        	map.addOverlay(marker);
+        	map.addOverlay(plane)
+
+        	marker.addEventListener("click", function(){          
+            	this.openInfoWindow(infoWindow);
+  
+        	});
+    	}
 	</script>  
 </body>  
 </html>
