@@ -104,4 +104,4 @@ def parseKML():
 if __name__ == '__main__':
 
     app.debug = True
-    app.run(port=5003)
+    app.run(port=5000)
